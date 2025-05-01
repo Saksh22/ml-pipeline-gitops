@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
-  generateName: ml-train-
+  name: ml-train
   namespace: argo
 spec:
   entrypoint: train-model
@@ -9,3 +9,12 @@ spec:
   - name: train-model
     container:
       image: saksh22/ml-train:latest
+      command: ["python"]
+      args: ["train.py"]
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "50m"
+        limits:
+          memory: "128Mi"
+          cpu: "100m"
