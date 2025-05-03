@@ -1,0 +1,46 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  name: ml-pipeline
+  namespace: argo
+spec:
+  entrypoint: ml-workflow
+  volumeClaimTemplates:
+  - metadata:
+      name: ml-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 1Gi
+
+  templates:
+  - name: ml-workflow
+    steps:
+    - - name: preprocessing
+        template: preprocess
+    - - name: training
+        template: train
+    - - name: evaluation
+        template: evaluate
+
+  - name: preprocess
+    container:
+      image: saksh22/ml-preprocess
+      volumeMounts:
+        - mountPath: /data
+          name: ml-data
+
+  - name: train
+    container:
+      image: saksh22/ml-train
+      volumeMounts:
+        - mountPath: /data
+          name: ml-data
+
+  - name: evaluate
+    container:
+      image: saksh22/ml-evaluate
+      volumeMounts:
+        - mountPath: /data
+          name: ml-data
